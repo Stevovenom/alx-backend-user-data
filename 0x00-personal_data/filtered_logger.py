@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
+"""
+Main file
+"""
+
 import re
 
 
 def filter_datum(fields, redaction, message, separator):
     """
-    function that returns the log message obfuscated
+    This function replaces the values of specified fields in a log message with a redaction string.
 
-    Arguments:
-        field (list): a list of strings representing all fields to obfuscate
-        redaction (str): a string representing by what the field will be obfuscated
-        message (str): a string representing the log message
-        separator (str): string representing characters seperating fields in message.
+    Args:
+        fields (list): A list of field names to obfuscate.
+        redaction (str): The string used to replace the values.
+        message (str): The log message to process.
+        separator (str): The separator used in the log message.
 
     Returns:
-        str: log message obfuscated
+        str: The obfuscated log message.
     """
-    return re.sub(r'(' + '|'.join(fields) + r')=[^' + separator + r']*',
-                  r'\1=' + redaction, message)
+    return re.sub(r'(' + '|'.join([re.escape(field) for field in fields]) + r')=[^' + re.escape(separator) + r']+', lambda m: m.group(0).split('=')[0] + '=' + redaction, message)
