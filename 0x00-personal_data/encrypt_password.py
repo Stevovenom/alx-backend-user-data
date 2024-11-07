@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """ Returns a salted, hashed password, byte in string """
-import bcrypt # type: ignore
+import bcrypt  # type: ignore
 
 
 def hash_password(password: str) -> bytes:
