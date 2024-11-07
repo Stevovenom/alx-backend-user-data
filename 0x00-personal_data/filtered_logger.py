@@ -9,8 +9,9 @@ import logging
 
 
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
-        """
+    """
+    Redacting formatter class
+    """
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
@@ -21,11 +22,8 @@ class RedactingFormatter(logging.Formatter):
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
-        message = record.getMessage()
-        message = filter_datum(
-            self.fields, self.REDACTION, message, self.SEPARATOR)
-        log_message = super(RedactingFormatter, self).format(record)
-        return log_message.replace(record.getMessage(), message)
+        return filter_datum(self.fields, self.REDACTION,
+                            super().format(record), self.SEPARATOR)
 
 
 def filter_datum(fields: List[str], redaction: str, message: str,
