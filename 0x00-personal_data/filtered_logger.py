@@ -7,7 +7,7 @@ import re
 from typing import List
 import logging
 import os
-import mysql.connector # type: ignore
+import mysql.connector  # type: ignore
 
 
 class RedactingFormatter(logging.Formatter):
@@ -58,6 +58,7 @@ def get_logger() -> logging.Logger:
     logger.addHandler(target_handler)
     return logger
 
+
 def get_db() -> mysql.connector.connection.MYSQLConnection:
     """
     The connection to the ALX mysql environment
@@ -69,6 +70,7 @@ def get_db() -> mysql.connector.connection.MYSQLConnection:
         database=os.getenv('PERSONAL_DATA_DB_NAME')
     )
     return db_connect
+
 
 def main() -> None:
     """
