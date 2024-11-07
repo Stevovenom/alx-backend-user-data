@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
-"""
-Main file
-"""
-
+""" Use of regex in replacing occurrences of certain field values """
 import re
 from typing import List
 import logging
+import mysql.connector # type: ignore
 import os
-import mysql.connector  # type: ignore
 
 
 class RedactingFormatter(logging.Formatter):
-    """
-    Redacting formatter class
+    """ Redacting Formatter class
     """
 
     REDACTION = "***"
@@ -32,6 +28,17 @@ class RedactingFormatter(logging.Formatter):
 PII_FIELDS = ("name", "email", "password", "ssn", "phone")
 
 
+def get_db() -> mysql.connector.connection.MYSQLConnection:
+    """ Connection to MySQL environment """
+    db_connect = mysql.connector.connect(
+        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
+        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        database=os.getenv('PERSONAL_DATA_DB_NAME')
+    )
+    return db_connect
+
+
 def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     """ Returns regex obfuscated log messages """
@@ -42,9 +49,7 @@ def filter_datum(fields: List[str], redaction: str, message: str,
 
 
 def get_logger() -> logging.Logger:
-    """
-    Returns a logging.Logger object
-    """
+    """ Returns a logging.Logger object """
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
     logger.propagate = False
@@ -59,23 +64,10 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def get_db() -> mysql.connector.connection.MYSQLConnection:
-    """
-    The connection to the ALX mysql environment
-    """
-    db_connect = mysql.connector.connect(
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD', ''),
-        host=os.getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
-        database=os.getenv('PERSONAL_DATA_DB_NAME')
-    )
-    return db_connect
-
-
 def main() -> None:
-    """
-    obtain the database connection using get_db and retrive all role in the
-    users table and display each row under a filtered format.
+    """ Obtain database connection using get_db
+    retrieve all role in the users table and display
+    each row under a filtered format
     """
     db = get_db()
     cursor = db.cursor()
@@ -93,5 +85,6 @@ def main() -> None:
     cursor.close()
     db.close()
 
-    if __name__ == '__main__':
-        main()
+
+if __name__ == '__main__':
+    main()
