@@ -4,19 +4,13 @@ Main file
 """
 
 import re
+from typing import List
 
 
-def filter_datum(fields, redaction, message, separator):
-    """
-    This function replaces the values of specified fields in a log message with a redaction string.
-
-    Args:
-        fields (list): A list of field names to obfuscate.
-        redaction (str): The string used to replace the values.
-        message (str): The log message to process.
-        separator (str): The separator used in the log message.
-
-    Returns:
-        str: The obfuscated log message.
-    """
-    return re.sub(r'(' + '|'.join([re.escape(field) for field in fields]) + r')=[^' + re.escape(separator) + r']+', lambda m: m.group(0).split('=')[0] + '=' + redaction, message)
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
+    """ Returns regex obfuscated log messages """
+    for field in fields:
+        message = re.sub(f'{field}=(.*?){separator}',
+                         f'{field}={redaction}{separator}', message)
+    return message
