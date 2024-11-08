@@ -3,7 +3,7 @@
 import re
 from typing import List
 import logging
-import mysql.connector # type: ignore
+import mysql.connector  # type: ignore
 import os
 
 
