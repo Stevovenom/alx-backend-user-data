@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """DB module
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, tuple_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -47,7 +47,7 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
-
+    
     def find_user_by(self, **kwargs) -> User:
         """
         Finds a user by arbitrary keyword arguments
@@ -62,10 +62,16 @@ class DB:
             NoResultFound: If no result is found for the query.
             InvalidRequestError: If invalid query arguments are passed.
         """
-        try:
-            # query the database using the keyword
-            user = self._session.query(User).filter_by(**kwargs).one()
-        except NoResultFound:
-            raise NoResultFound("Not found")
-
-        except InvalidRequestError:
+        fields, values = [], []
+        for key, value in kwargs.items():
+            if hasattr(User, key):
+                fields.append(getattr(User, key))
+                values.append(value)
+            else:
+                raise InvalidRequestError()
+        result = self._session.query(User).filter(
+            tuple_(*fields).in_([tuple(values)])
+        ).first()
+        if result is None:
+            raise NoResultFound()
+        return result
