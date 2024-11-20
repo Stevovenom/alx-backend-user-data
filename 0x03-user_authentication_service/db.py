@@ -48,30 +48,22 @@ class DB:
         self._session.commit()
         return new_user
 
-    def find_user_by(self, **kwargs) -> User:
-        """
-        Finds a user by arbitrary keyword arguments
-
-        Args:
-            **kwargs: arbitrary key word arguments for filtering
-
-        Returns:
-            The first user object that matches the filter
+    def find_user_by(self, **kwargs: Dict[str, str]) -> User:
+        """Find a user by specified attributes.
 
         Raises:
-            NoResultFound: If no result is found for the query.
-            InvalidRequestError: If invalid query arguments are passed.
+            error: NoResultFound: When no results are found.
+            error: InvalidRequestError: When invalid query arguments are passed
+
+        Returns:
+            User: First row found in the `users` table.
         """
-        fields, values = [], []
-        for key, value in kwargs.items():
-            if hasattr(User, key):
-                fields.append(getattr(User, key))
-                values.append(value)
-            else:
-                raise InvalidRequestError()
-        result = self._session.query(User).filter(
-            tuple_(*fields).in_([tuple(values)])
-        ).first()
-        if result is None:
+        session = self._session
+        try:
+            user = session.query(User).filter_by(**kwargs).one()
+        except NoResultFound:
             raise NoResultFound()
-        return result
+        except InvalidRequestError:
+            raise InvalidRequestError()
+        # print("Type of user: {}".format(type(user)))
+        return user
